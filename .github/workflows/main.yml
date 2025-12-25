@@ -32,8 +32,14 @@ jobs:
 
       - name: Build Android APK
         run: |
-          # الأوامر أدناه تضمن عدم توقف البناء لطلب مدخلات من المستخدم
+          # أضفنا --yes لمنع توقف البناء لطلب إدخال من المستخدم
           flet build apk --yes --project "LordApp"
+          
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LordApp-Working-Release
+          path: build/apk/*.apk
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
