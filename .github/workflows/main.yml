@@ -24,9 +24,11 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Flutter
+      # 🔴 تثبيت نفس إصدار Flutter المطلوب من Flet
+      - name: Set up Flutter (REQUIRED VERSION)
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: "3.38.3"
           channel: stable
 
       - name: Install dependencies
@@ -34,11 +36,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade flet requests
 
-      - name: Build Android APK (NON-INTERACTIVE)
+      # 🔒 منع أي تفاعل أو محاولة تنزيل Flutter
+      - name: Build Android APK (STRICT NON-INTERACTIVE)
         env:
           FLET_NO_INTERACTIVE: "1"
+          FLET_SKIP_FLUTTER_INSTALL: "1"
         run: |
-          flet build apk --no-interactive
+          flutter --version
+          flet build apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -46,56 +51,4 @@ jobs:
           name: LordApp-APK
           path: |
             build/**/*.apk
-          if-no-files-found: error          yes | flet build apk --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4 # تحديث إلزامي للنسخة v4 لحل الخطأ الظاهر في صورك
-        with:
-          name: LordApp-Final-Package
-          path: build/apk/*.apk
           if-no-files-found: error
-          yes | flet build apk --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4 # تحديث إلزامي لحل خطأ v3 المُلغى
-        with:
-          name: LordApp-Release-Package
-          path: build/apk/*.apk
-          if-no-files-found: error
-          yes | flet build apk --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4 # تحديث إلزامي للنسخة v4 لحل الخطأ في صورك
-        with:
-          name: LordApp-Final-Release
-          path: build/apk/*.apk
-          yes | flet build apk --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4 # تحديث إلزامي للنسخة الرابعة لحل الخطأ الظاهر في صورك
-        with:
-          name: LordApp-Working-Build
-          path: build/apk/*.apk
-          yes | flet build apk --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4 # التحديث للنسخة الرابعة لحل مشكلة الإلغاء
-        with:
-          name: LordApp-Working-Build
-          path: build/apk/*.apk
-          if-no-files-found: error
-          # تم حذف --project لأن ملفاتك في المجلد الرئيسي (Root)
-          yes | flet build apk --yes
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: LordApp-Working-Build
-          path: build/apk/*.apk
-          if-no-files-found: error
-          
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: LordApp-Working-Release
-          path: build/apk/*.apk
