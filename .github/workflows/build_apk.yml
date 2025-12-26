@@ -1,30 +1,50 @@
-name: Build Android APK
+name: Build APK
+
 on:
   push:
-    branches: [ main ] # سيتم البناء عند كل تحديث للكود
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Flet and Dependencies
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter (required by Flet)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.3"
+          channel: stable
+
+      - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install flet requests
 
-      - name: Build APK
+      # ✅ الحل الحقيقي لمشكلة EOFError
+      - name: Build Android APK (FORCED INPUT)
         run: |
-          # هذا الأمر يحول الكود إلى تطبيق أندرويد
-          flet build apk --project "LordApp"
+          flutter --version
+          printf "y\n" | flet build apk
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: build/apk/*.apk
+          name: LordApp-APK
+          path: |
+            build/**/*.apk
+          if-no-files-found: error
