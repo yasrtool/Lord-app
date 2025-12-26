@@ -17,7 +17,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up Java
-        uses: actions/setup-java@v4 # تحديث للنسخة الرابعة
+        uses: actions/setup-java@v4 # تحديث للنسخة v4 لحل خطأ v3 المُلغى
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -33,7 +33,15 @@ jobs:
 
       - name: Build Android APK
         run: |
-          # استخدام 'yes |' يمنع ظهور خطأ EOFError عبر الضغط التلقائي على Enter
+          # نستخدم 'yes |' لضغط Enter تلقائياً وحل مشكلة EOFError الظاهرة في صورك
+          yes | flet build apk --yes
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4 # تحديث إلزامي للنسخة v4 لحل الخطأ الظاهر في صورك
+        with:
+          name: LordApp-Final-Package
+          path: build/apk/*.apk
+          if-no-files-found: error
           yes | flet build apk --yes
 
       - name: Upload APK
