@@ -15,7 +15,7 @@ SUBJECTS = {
     "History": {"progress": 0.2, "units": ["Ancient", "Medieval", "Modern"]}
 }
 
-# --- دالة التطبيق الرئيسية ---
+# --- الدالة الرئيسية للتطبيق ---
 def main(page: ft.Page):
     page.title = "English Stage 2 - Lord App"
     page.theme_mode = ft.ThemeMode.LIGHT
@@ -35,6 +35,93 @@ def main(page: ft.Page):
                 page.snack_bar = ft.SnackBar(ft.Text("✅ تم تسجيل الدخول بنجاح!"))
                 page.snack_bar.open = True
                 page.update()
+                show_dashboard(user)
+            else:
+                page.snack_bar = ft.SnackBar(ft.Text("❌ اسم المستخدم أو كلمة المرور غير صحيحة!"))
+                page.snack_bar.open = True
+                page.update()
+
+        page.add(
+            ft.Column([
+                ft.Text("تسجيل الدخول", size=30, weight="bold"),
+                username,
+                password,
+                ft.ElevatedButton("تسجيل الدخول", on_click=login_click),
+            ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER, expand=True)
+        )
+
+    # --- شاشة Dashboard ---
+    def show_dashboard(user):
+        page.clean()
+        welcome_text = ft.Text(f"مرحبًا {user}!", size=25, weight="bold")
+        subject_buttons = []
+        for subject, info in SUBJECTS.items():
+            btn = ft.ElevatedButton(
+                f"{subject} - {int(info['progress']*100)}%",
+                on_click=lambda e, s=subject: show_subject_details(s, user)
+            )
+            subject_buttons.append(btn)
+
+        # زر لتبديل الوضع بين Light / Dark
+        theme_toggle = ft.IconButton(
+            ft.icons.BRIGHTNESS_4,
+            on_click=lambda e: toggle_theme()
+        )
+
+        page.add(
+            ft.Column([
+                ft.Row([welcome_text, theme_toggle], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Text(f"عدد المواد: {len(SUBJECTS)}", size=18),
+                ft.Column(subject_buttons, spacing=10),
+                ft.ElevatedButton("التواصل مع الإدارة", on_click=lambda e: page.launch_url("https://t.me/Yasr_ammar1")),
+                ft.ElevatedButton("تسجيل الخروج", on_click=lambda e: confirm_logout())
+            ], spacing=15)
+        )
+
+    # --- شاشة تفاصيل المادة ---
+    def show_subject_details(subject_name, user):
+        page.clean()
+        info = SUBJECTS[subject_name]
+
+        units_tabs = [ft.Tab(text=unit, content=ft.Text(f"محتوى الوحدة: {unit}")) for unit in info["units"]]
+
+        page.add(
+            ft.Column([
+                ft.Text(f"صفحة المادة: {subject_name}", size=22, weight="bold"),
+                ft.ProgressBar(value=info["progress"], width=300),
+                ft.Tabs(tabs=units_tabs, expand=True),
+                ft.Row([
+                    ft.ElevatedButton("العودة للرئيسية", on_click=lambda e: show_dashboard(user)),
+                    ft.ElevatedButton("مشاركة المادة", on_click=lambda e: page.launch_url(f"https://t.me/Yasr_ammar1?text=Check {subject_name}"))
+                ], spacing=10)
+            ], spacing=15)
+        )
+
+    # --- تبديل الوضع بين Light / Dark ---
+    def toggle_theme():
+        page.theme_mode = ft.ThemeMode.DARK if page.theme_mode == ft.ThemeMode.LIGHT else ft.ThemeMode.LIGHT
+        page.update()
+
+    # --- تأكيد تسجيل الخروج ---
+    def confirm_logout():
+        def yes_click(e):
+            show_login()
+        page.dialog = ft.AlertDialog(
+            title=ft.Text("تأكيد الخروج"),
+            content=ft.Text("هل تريد تسجيل الخروج فعلاً؟"),
+            actions=[
+                ft.TextButton("لا", on_click=lambda e: page.dialog.close()),
+                ft.TextButton("نعم", on_click=lambda e: yes_click(e))
+            ]
+        )
+        page.dialog.open = True
+        page.update()
+
+    # --- بدء التطبيق من تسجيل الدخول ---
+    show_login()
+
+# --- تشغيل التطبيق (يجب أن يكون في آخر السطر) ---
+ft.app(target=main)                page.update()
                 show_dashboard(user)
             else:
                 page.snack_bar = ft.SnackBar(ft.Text("❌ اسم المستخدم أو كلمة المرور غير صحيحة!"))
