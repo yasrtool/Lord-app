@@ -1,4 +1,5 @@
 name: Build APK
+
 on:
   push:
     branches: [ main ]
@@ -7,8 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -17,24 +19,34 @@ jobs:
           python-version: "3.10"
 
       - name: Set up Java
-        uses: actions/setup-java@v4 # تحديث للنسخة v4 لحل خطأ v3 المُلغى
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install --upgrade flet requests
 
-      - name: Build Android APK
+      - name: Build Android APK (NON-INTERACTIVE)
+        env:
+          FLET_NO_INTERACTIVE: "1"
         run: |
-          # نستخدم 'yes |' لضغط Enter تلقائياً وحل مشكلة EOFError الظاهرة في صورك
-          yes | flet build apk --yes
+          flet build apk --no-interactive
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LordApp-APK
+          path: |
+            build/**/*.apk
+          if-no-files-found: error          yes | flet build apk --yes
 
       - name: Upload APK
         uses: actions/upload-artifact@v4 # تحديث إلزامي للنسخة v4 لحل الخطأ الظاهر في صورك
