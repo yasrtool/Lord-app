@@ -1,12 +1,11 @@
-# إعدادات تطبيق Flet
 app:
   name: "LordApp"
-  package: "com.yasrtool.lordapp" # استبدل yasrtool باسمك أو معرفك الخاص
+  package: "com.yasrtool.lordapp"
+  main_script: "main.py"
   version: "1.0.0"
-  build_number: 1
-  display_name: "Lord App"
 
-# إعدادات الأندرويد
 android:
+  # ربط الأيقونة (تأكد أن الاسم مطابق لملفك icon.PNG)
+  icon: "icon.PNG" 
   permissions:
     - INTERNET
