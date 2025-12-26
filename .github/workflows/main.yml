@@ -29,11 +29,18 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade flet requests
+          pip install --upgrade flet
 
       - name: Build Android APK
         run: |
           # نستخدم 'yes |' لضغط Enter تلقائياً وحل مشكلة EOFError الظاهرة في صورك
+          yes | flet build apk --yes
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4 # تحديث إلزامي للنسخة الرابعة لحل الخطأ الظاهر في صورك
+        with:
+          name: LordApp-Working-Build
+          path: build/apk/*.apk
           yes | flet build apk --yes
 
       - name: Upload APK
