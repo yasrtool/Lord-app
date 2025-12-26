@@ -33,7 +33,15 @@ jobs:
 
       - name: Build Android APK
         run: |
-          # نستخدم 'yes |' لضمان الضغط على Enter تلقائياً لأي سؤال يطرحه Flet
+          # نستخدم 'yes |' لضغط Enter تلقائياً وحل مشكلة EOFError الظاهرة في صورك
+          yes | flet build apk --yes
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4 # التحديث للنسخة الرابعة لحل مشكلة الإلغاء
+        with:
+          name: LordApp-Working-Build
+          path: build/apk/*.apk
+          if-no-files-found: error
           # تم حذف --project لأن ملفاتك في المجلد الرئيسي (Root)
           yes | flet build apk --yes
 
